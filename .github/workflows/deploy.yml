@@ -1,0 +1,75 @@
+name: Deploy after merged PR
+
+on:
+  pull_request:
+    branches:
+      - master
+    types:
+      - closed
+
+jobs:
+  deploy:
+    if: github.event.pull_request.merged == true
+    runs-on:
+      - self-hosted
+      - wsl
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests before deployment
+        run: npm test
+
+      - name: Check Node.js and npm versions
+        run: |
+          node --version
+          npm --version
+
+      - name: Build application
+        run: npm run build
+
+      - name: Stop old application
+        run: |
+          if [ -f /opt/github-action-demo/app.pid ]; then
+            PID=$(cat /opt/github-action-demo/app.pid)
+
+            if kill -0 "$PID" 2>/dev/null; then
+              kill "$PID"
+              sleep 2
+            fi
+
+            rm -f /opt/github-action-demo/app.pid
+          fi
+
+      - name: Copy new application
+        run: |
+          mkdir -p /opt/github-action-demo
+          rm -rf /opt/github-action-demo/src
+          cp -R src /opt/github-action-demo/src
+          cp package.json package-lock.json /opt/github-action-demo/
+
+      - name: Install production dependencies
+        run: |
+          cd /opt/github-action-demo
+          npm ci --omit=dev
+
+      - name: Start application
+        run: |
+          cd /opt/github-action-demo
+          RUNNER_TRACKING_ID="" nohup node src/app.js > app.log 2>&1 &
+          echo $! > app.pid
+
+      - name: Verify deployment
+        run: |
+          sleep 5
+          curl --fail http://localhost:3000/hello
