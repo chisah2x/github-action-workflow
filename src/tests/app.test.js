@@ -18,3 +18,10 @@ test('GET /bye returns a goodbye', async () => {
   expect(response.statusCode).toBe(200);
   expect(response.text).toBe('Bye from Express');
 });
+
+test('GET /hey returns a greeting', async () => {
+  const response = await request(app).get('/hey');
+
+  expect(response.statusCode).toBe(200);
+  expect(response.text).toBe('Hey from Express');
+});

@@ -12,6 +12,10 @@ app.get('/bye', (request, response) => {
   response.send('Bye from Express');
 });
 
+app.get('/hey', (request, response) => {
+  response.send('Hey from Express');
+});
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   app.listen(port, () => {
     console.log(`App listening on port ${port}`);
