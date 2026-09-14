@@ -9,7 +9,7 @@ test('GET /hello returns a greeting', async () => {
   const response = await request(app).get('/hello');
 
   expect(response.statusCode).toBe(200);
-  expect(response.text).toBe('Hello from Express');
+  expect(response.text).toBe('Hello from Express! Welcome back to the world of Node.js and Express. This is a simple greeting endpoint that responds with a friendly message.');
 });
 
 test('GET /bye returns a goodbye', async () => {
