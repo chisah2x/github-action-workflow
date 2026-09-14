@@ -12,7 +12,8 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on:
       - self-hosted
-      - wsl
+      - Linux
+      - X64
 
     steps:
       - name: Check out repository
